@@ -20,12 +20,28 @@
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   }
+  fieldset {
+    margin-bottom: 20px;
+    padding: 10px;
+  }
+  legend {
+    font-weight: bold;
+  }
   label {
     display: block;
     margin-bottom: 8px;
     font-weight: bold;
   }
   input,select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 16px;
+  }
+  select {
     width: 100%;
     padding: 8px;
     margin-bottom: 20px;
@@ -45,11 +61,12 @@
     background-color: #45a049;
   }
   #result {
-    font-size: 18px;
+    font-size: 22px;
     margin-top: 20px;
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
   }
-
-
 </style>
 <script>
 function calculateCarbonFootprint() {
@@ -62,9 +79,45 @@ function calculateCarbonFootprint() {
     var hazardousWaste = parseFloat(document.getElementById("hazardousWaste").value);
     var mileagePerVehicle = parseFloat(document.getElementById("mileagePerVehicle").value);
     var numVehicles = parseFloat(document.getElementById("numVehicles").value);
+    var totalMilesDriven = parseFloat(document.getElementById("totalMilesDriven").value);
+    var airMiles = parseFloat(document.getElementById("airMiles").value);
+    var railMiles = parseFloat(document.getElementById("railMiles").value);
+    var shipmentMethod = document.getElementById("shipmentMethod").value;
+    var avgShipmentWeight = parseFloat(document.getElementById("avgShipmentWeight").value);
+    var avgShipmentDistance = parseFloat(document.getElementById("avgShipmentDistance").value);
 
-    var carbonFootprint = (electricity * 0.4) + (naturalGas * 0.2) + (dieselPetrol * 2.68) + (heatingOil * 2.93) +
-                          (solidWaste * 0.6) + (liquidWaste * 0.5) + (hazardousWaste * 1.0) + (mileagePerVehicle * numVehicles * 0.4);
+    // Calculate emissions from energy usage
+    var energyEmissions = (electricity * 0.4) + (naturalGas * 0.2) + (heatingOil * 2.93) + (dieselPetrol * 2.68);
+
+    // Calculate emissions from vehicles
+    var vehicleEmissions = 0;
+    if (document.getElementById("vehicleFuelType").value === "gasoline") {
+        vehicleEmissions = mileagePerVehicle * numVehicles * 0.4;
+    } else if (document.getElementById("vehicleFuelType").value === "diesel") {
+        vehicleEmissions = mileagePerVehicle * numVehicles * 0.5;
+    }
+
+    // Calculate emissions from total miles driven
+    var totalMilesEmissions = totalMilesDriven * 0.4;
+
+    // Calculate emissions from air travel
+    var airEmissions = airMiles * 0.4;
+
+    // Calculate emissions from rail travel
+    var railEmissions = railMiles * 0.4;
+
+    // Calculate emissions from shipping
+    var shippingEmissions = 0;
+    if (shipmentMethod === "truck") {
+        shippingEmissions = avgShipmentWeight * avgShipmentDistance * 0.001;
+    } else if (shipmentMethod === "ocean") {
+        shippingEmissions = avgShipmentWeight * avgShipmentDistance * 0.002;
+    } else if (shipmentMethod === "rail") {
+        shippingEmissions = avgShipmentWeight * avgShipmentDistance * 0.0015;
+    }
+
+    // Calculate total carbon footprint
+    var carbonFootprint = energyEmissions + vehicleEmissions + totalMilesEmissions + airEmissions + railEmissions + shippingEmissions;
 
     document.getElementById("result").innerText = "Total Carbon Footprint: " + carbonFootprint.toFixed(2) + " kg CO2e";
 }
@@ -75,55 +128,100 @@ function calculateCarbonFootprint() {
 <h2>Carbon Footprint Calculator</h2>
 
 <form>
-  <label for="companyName">Company Name: </label>
-  <input type="text" id="companyName" name="companyName"><br>
+  <fieldset>
+    <legend>Company Details</legend>
+    <label for="companyName">Company Name: </label>
+    <input type="text" id="companyName" name="companyName"><br>
 
-  <label for="industryType">Industry Type: </label>
-  <select id="industryType" name="industryType">
-    <option value="manufacturing">Manufacturing</option>
-    <option value="transportation">Transportation</option>
-    <option value="retail">Retail</option>
-    <option value="agriculture">Agriculture</option>
-    <option value="hospitality">Hospitality</option>
-    <option value="others">Others</option>
-  </select><br>
+    <label for="industryType">Industry Type: </label>
+    <select id="industryType" name="industryType">
+      <option value="manufacturing">Manufacturing</option>
+      <option value="transportation">Transportation</option>
+      <option value="retail">Retail</option>
+      <option value="agriculture">Agriculture</option>
+      <option value="hospitality">Hospitality</option>
+      <option value="others">Others</option>
+    </select><br>
 
-  <label for="location">Location (Country/Region): </label>
-  <select id="location" name="location">
-    <option value="USA">United States</option>
-    <option value="UK">United Kingdom</option>
-    <option value="Canada">Canada</option>
-    <option value="Canada">India</option>
-    <!-- Add more countries as needed -->
-  </select><br>
+    <label for="location">Location (Country/Region): </label>
+    <select id="location" name="location">
+      <option value="USA">United States</option>
+      <option value="UK">United Kingdom</option>
+      <option value="Canada">Canada</option>
+      <option value="India">India</option>
+      <!-- Add more countries as needed -->
+    </select><br>
+  </fieldset>
 
-  <!-- Add the rest of the questions here -->
-  <label for="electricity">Annual Electricity Usage (kWh): </label>
-  <input type="number" id="electricity" name="electricity"><br>
+  <fieldset>
+    <legend>Energy Usage</legend>
+    <label for="electricity">Annual Electricity Usage (kWh): </label>
+    <input type="number" id="electricity" name="electricity"><br>
 
-  <label for="naturalGas">Annual Natural Gas Usage (m<sup>3</sup>): </label>
-  <input type="number" id="naturalGas" name="naturalGas"><br>
+    <label for="naturalGas">Annual Natural Gas Usage (m<sup>3</sup>): </label>
+    <input type="number" id="naturalGas" name="naturalGas"><br>
 
-  <label for="dieselPetrol">Annual Diesel/Petrol Usage (liters): </label>
-  <input type="number" id="dieselPetrol" name="dieselPetrol"><br>
+    <label for="dieselPetrol">Annual Diesel/Petrol Usage (liters): </label>
+    <input type="number" id="dieselPetrol" name="dieselPetrol"><br>
 
-  <label for="heatingOil">Annual Heating Oil Usage (liters): </label>
-  <input type="number" id="heatingOil" name="heatingOil"><br>
+    <label for="heatingOil">Annual Heating Oil Usage (liters): </label>
+    <input type="number" id="heatingOil" name="heatingOil"><br>
+  </fieldset>
 
-  <label for="solidWaste">Annual Solid Waste Generation (kilograms): </label>
-  <input type="number" id="solidWaste" name="solidWaste"><br>
+  <fieldset>
+    <legend>Waste Generation</legend>
+    <label for="solidWaste">Annual Solid Waste Generation (kilograms): </label>
+    <input type="number" id="solidWaste" name="solidWaste"><br>
 
-  <label for="liquidWaste">Annual Liquid Waste Generation (liters): </label>
-  <input type="number" id="liquidWaste" name="liquidWaste"><br>
+    <label for="liquidWaste">Annual Liquid Waste Generation (liters): </label>
+    <input type="number" id="liquidWaste" name="liquidWaste"><br>
 
-  <label for="hazardousWaste">Annual Hazardous Waste Generation (kilograms): </label>
-  <input type="number" id="hazardousWaste" name="hazardousWaste"><br>
+    <label for="hazardousWaste">Annual Hazardous Waste Generation (kilograms): </label>
+    <input type="number" id="hazardousWaste" name="hazardousWaste"><br>
+  </fieldset>
 
-  <label for="mileagePerVehicle">Annual Mileage per Company Vehicle (miles): </label>
-  <input type="number" id="mileagePerVehicle" name="mileagePerVehicle"><br>
+  <fieldset>
+    <legend>Vehicle Details</legend>
+    <label for="vehicleFuelType">Fuel Type: </label>
+    <select id="vehicleFuelType" name="vehicleFuelType">
+      <option value="gasoline">Gasoline</option>
+      <option value="diesel">Diesel</option>
+    </select><br>
 
-  <label for="numVehicles">Number of Company Vehicles: </label>
-  <input type="number" id="numVehicles" name="numVehicles"><br>
+    <label for="mileagePerVehicle">Average Mileage per Vehicle (miles): </label>
+    <input type="number" id="mileagePerVehicle" name="mileagePerVehicle"><br>
+
+    <label for="numVehicles">Number of Company Vehicles: </label>
+    <input type="number" id="numVehicles" name="numVehicles"><br>
+
+    <label for="totalMilesDriven">Total Miles Driven per Year: </label>
+    <input type="number" id="totalMilesDriven" name="totalMilesDriven"><br>
+  </fieldset>
+
+  <fieldset>
+    <legend>Travel</legend>
+    <label for="airMiles">Total Air Travel Miles: </label>
+    <input type="number" id="airMiles" name="airMiles"><br>
+
+    <label for="railMiles">Total Rail Travel Miles: </label>
+    <input type="number" id="railMiles" name="railMiles"><br>
+  </fieldset>
+
+  <fieldset>
+    <legend>Shipping</legend>
+    <label for="shipmentMethod">Shipping Method: </label>
+    <select id="shipmentMethod" name="shipmentMethod">
+      <option value="truck">Truck/Ground</option>
+      <option value="ocean">Ocean/Water</option>
+      <option value="rail">Rail</option>
+    </select><br>
+
+    <label for="avgShipmentWeight">Average Shipment Weight (kg): </label>
+    <input type="number" id="avgShipmentWeight" name="avgShipmentWeight"><br>
+
+    <label for="avgShipmentDistance">Average Shipment Distance (km): </label>
+    <input type="number" id="avgShipmentDistance" name="avgShipmentDistance"><br>
+  </fieldset>
 
   <button type="button" onclick="calculateCarbonFootprint()">Calculate Carbon Footprint</button>
 </form>
