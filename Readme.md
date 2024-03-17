@@ -30,8 +30,8 @@ The analytics provide valuable insights into:
 As part of the energy consumption analytics project, a formula has been developed to calculate the carbon footprint of organizations. The formula incorporates various factors such as electricity usage, natural gas usage, diesel/petrol usage, heating oil usage, solid waste generation, liquid waste generation, hazardous waste generation, mileage per vehicle, and the number of company vehicles. The carbon footprint is calculated using the following formula:
 
 Total Carbon Footprint = (Electricity usage * 0.4) + (Natural gas usage * 0.2) + (Diesel/petrol usage * 2.68) + (Heating oil usage * 2.93) +
-                         (Solid waste generation * 0.6) + (Liquid waste generation * 0.5) + (Hazardous waste generation * 1.0) +
-                         (Mileage per vehicle * Num vehicles * 0.4)
+(Solid waste generation * 0.6) + (Liquid waste generation * 0.5) + (Hazardous waste generation * 1.0) + (Mileage per vehicle * Num vehicles * 0.4)
+
 
 The units for each parameter are as follows:
 
